@@ -1,23 +1,47 @@
-﻿namespace Example.VideoGameTracker.Api.Models
+﻿using System.Collections;
+
+namespace Example.VideoGameTracker.Api.Models
 {
-    public class FavoriteGames
+    public class FavoriteGames : IEnumerable<Game>
     {
-        public IReadOnlyList<Game> Games { get; }
+        private readonly HashSet<Game> _games;
+
+        public IReadOnlySet<Game> Games => _games;
 
         public FavoriteGames(IEnumerable<Game> games)
         {
-            Games = games.ToList();
+            _games = new HashSet<Game>(games);
+        }
+
+        public bool AddFavorite(Game game)
+        {
+            return _games.Add(game);
+        }
+
+        public bool RemoveFavorite(Game game)
+        {
+            return _games.Remove(game);
         }
 
         public IEnumerable<Game> Compare(FavoriteGames other, FavoriteGameComparison mode)
         {
             return mode switch
             {
-                FavoriteGameComparison.Union => Games.Union(other.Games),
-                FavoriteGameComparison.Intersection => Games.Intersect(other.Games),
-                FavoriteGameComparison.Difference => other.Games.Except(Games),
+                FavoriteGameComparison.Union => _games.Union(other.Games),
+                FavoriteGameComparison.Intersection => _games.Intersect(other.Games),
+                FavoriteGameComparison.Difference => other._games.Except(Games),
                 _ => throw new NotImplementedException(),
             };
+        }
+
+        public IEnumerator<Game> GetEnumerator()
+        {
+            return _games.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _games.GetEnumerator();
         }
     }
 }

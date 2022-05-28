@@ -4,6 +4,7 @@ namespace Example.VideoGameTracker.Api.DataAccess
 {
     public interface IVideoGameDatabase
     {
-        IAsyncEnumerable<Game> GetGamesAsync(string search, string ordering, CancellationToken cancellation);
+        Task<IEnumerable<Game>> GetGamesAsync(string search, string ordering, CancellationToken cancellation);
+        Task<Game> GetGameAsync(int gameId, CancellationToken cancellationToken);
     }
 }

@@ -20,9 +20,9 @@ namespace Example.VideoGameTracker.Api.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IAsyncEnumerable<Game> GetGamesAsync(string q, string sort, CancellationToken cancellation)
+        public Task<IEnumerable<Game>> GetGamesAsync([FromQuery] GetGamesParameters parameters, CancellationToken cancellation)
         {
-            return _videoGameDatabase.GetGamesAsync(q, sort, cancellation);
+            return _videoGameDatabase.GetGamesAsync(parameters.q, parameters.sort, cancellation);
         }
     }
 }

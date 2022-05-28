@@ -10,33 +10,41 @@ namespace Example.VideoGameTracker.Api.Controllers
     {
         private readonly ILogger<UsersController> _logger;
         private readonly InMemoryUserDatabase _userDatabase;
+        private readonly IVideoGameDatabase _videoGameDatabase;
 
-        public UsersController(ILogger<UsersController> logger, InMemoryUserDatabase userDatabase)
+        public UsersController(ILogger<UsersController> logger, InMemoryUserDatabase userDatabase, IVideoGameDatabase videoGameDatabase)
         {
             _logger = logger;
             _userDatabase = userDatabase;
+            _videoGameDatabase = videoGameDatabase;
         }
 
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public IActionResult CreateNewUser(User user)
+        public async Task<IActionResult> CreateNewUser(UserRequest user)
         {
-            if (_userDatabase.AddNewUser(user))
+            if (await _userDatabase.AddNewUserAsync(new User(user)))
             {
-                return StatusCode(StatusCodes.Status201Created, true);
+                return StatusCode(StatusCodes.Status201Created);
             }
 
-            return StatusCode(StatusCodes.Status409Conflict);
+            return Conflict();
         }
 
         [HttpGet]
         [Route("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public User GetUser(int userId)
+        public async Task<IActionResult> GetUser(int userId)
         {
-            return _userDatabase.GetUser(userId);
+            var user = await _userDatabase.GetUserAsync(userId);
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(user);
         }
 
         [HttpPost]
@@ -45,49 +53,85 @@ namespace Example.VideoGameTracker.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public IActionResult AddFavoriteGame(int userId)
+        public async Task<IActionResult> AddFavoriteGame(int userId, [FromBody] AddFavoriteRequest request, CancellationToken cancellationToken)
         {
-            return StatusCode(StatusCodes.Status201Created, true);
+            var user = await _userDatabase.GetUserAsync(userId);
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            var game = await _videoGameDatabase.GetGameAsync(request.GameId, cancellationToken);
+            if (game is null)
+            {
+                return BadRequest();
+            }
+
+            // TODO: thread safety
+            if (!user.Games.AddFavorite(game))
+            {
+                return Conflict();
+            }
+
+            // TODO: update database? can't depend on a local reference
+
+            return NoContent();
         }
 
         [HttpDelete]
         [Route("{userId}/games/{gameId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult RemoveFavoriteGame(int userId, int gameId)
+        public async Task<IActionResult> RemoveFavoriteGame(int userId, int gameId)
         {
-            var user = _userDatabase.GetUser(userId);
-            user.FavoriteGames.Compare(null, FavoriteGameComparison.Union);
-            return StatusCode(StatusCodes.Status201Created, true);
+            var user = await _userDatabase.GetUserAsync(userId);
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            // TODO: thread safety
+            if (!user.Games.RemoveFavorite(new Game(gameId)))
+            {
+                return NotFound($"Game {gameId}");
+            }
+
+            // TODO: update database? can't depend on a local reference
+
+            return NoContent();
         }
 
         [HttpPost]
-        [Route("{userId}/union")]
+        [Route("{userId}/comparison")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult UnionUserFavorites(int userId)
+        public async Task<IActionResult> DiffUserFavorites(
+            int userId,
+            [FromBody] ComparisonRequest comparisonRequest)
         {
-            return StatusCode(StatusCodes.Status201Created, true);
+            var user = await _userDatabase.GetUserAsync(userId);
+            if (user is null)
+            {
+                return NotFound();
+            }
 
-        }
+            var otherUser = await _userDatabase.GetUserAsync(comparisonRequest.OtherUserId);
+            if (otherUser is null)
+            {
+                return BadRequest();
+            }
 
-        [HttpPost]
-        [Route("{userId}/intersection")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult IntersectUserFavorites(int userId)
-        {
-            return StatusCode(StatusCodes.Status201Created, true);
+            var gameComparison = user.Games.Compare(otherUser.Games, comparisonRequest.Comparison);
 
-        }
+            var response = new ComparisonResponse()
+            {
+                UserId = user.UserId,
+                OtherUserId = otherUser.UserId,
+                Comparison = comparisonRequest.Comparison,
+                Games = gameComparison.ToList()
+            };
 
-        [HttpPost]
-        [Route("{userId}/difference")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult DiffUserFavorites(int userId)
-        {
-            return StatusCode(StatusCodes.Status201Created, true);
+            return Ok(response);
 
         }
     }
