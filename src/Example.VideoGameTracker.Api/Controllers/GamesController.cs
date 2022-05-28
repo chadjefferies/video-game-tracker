@@ -17,12 +17,17 @@ namespace Example.VideoGameTracker.Api.Controllers
             _videoGameDatabase = videoGameDatabase;
         }
 
-        [HttpGet]
+        /// <summary>
+        /// Retrieve a list of video games matching the specified filter parameters.
+        /// </summary>
+        /// <returns>A filtered list of video games.</returns>
+        [HttpGet()]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public Task<IEnumerable<Game>> GetGamesAsync([FromQuery] GetGamesParameters parameters, CancellationToken cancellation)
+        public async Task<IActionResult> GetGamesAsync([FromQuery] GetGamesParameters parameters, CancellationToken cancellation)
         {
-            return _videoGameDatabase.GetGamesAsync(parameters.q, parameters.sort, cancellation);
+            var gameData = await _videoGameDatabase.GetGamesAsync(parameters.q, parameters.sort, cancellation);
+            return Ok(gameData);
         }
     }
 }
