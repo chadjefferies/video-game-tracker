@@ -19,6 +19,9 @@ namespace Example.VideoGameTracker.Api.Controllers
             _videoGameDatabase = videoGameDatabase;
         }
 
+        /// <summary>
+        /// Create a new user.
+        /// </summary>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -32,6 +35,9 @@ namespace Example.VideoGameTracker.Api.Controllers
             return Conflict();
         }
 
+        /// <summary>
+        /// Get a user by the specified userId
+        /// </summary>
         [HttpGet]
         [Route("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -47,6 +53,9 @@ namespace Example.VideoGameTracker.Api.Controllers
             return Ok(user);
         }
 
+        /// <summary>
+        /// Add a game to the user's list of favorite games.
+        /// </summary>
         [HttpPost]
         [Route("{userId}/games")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -78,6 +87,9 @@ namespace Example.VideoGameTracker.Api.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Remove a game from the user's list of favorite games.
+        /// </summary>
         [HttpDelete]
         [Route("{userId}/games/{gameId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -101,11 +113,14 @@ namespace Example.VideoGameTracker.Api.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Compare the user's list of favorite games to another.
+        /// </summary>
         [HttpPost]
         [Route("{userId}/comparison")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DiffUserFavorites(
+        public async Task<IActionResult> CompareUserFavorites(
             int userId,
             [FromBody] ComparisonRequest comparisonRequest)
         {

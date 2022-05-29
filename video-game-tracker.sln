@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.VideoGameTracker.Ap
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6087B072-D247-4CF9-9133-AF082ED7225C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{75B92DD1-00E3-4454-A2BD-C35472BA8F02}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.VideoGameTracker.Api.Tests", "test\Example.VideoGameTracker.Api.Tests\Example.VideoGameTracker.Api.Tests.csproj", "{90B60D4D-FE8D-4328-B783-13EF4D852D28}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,12 +21,17 @@ Global
 		{3539C823-0795-4F50-8145-1EC7763DFF7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3539C823-0795-4F50-8145-1EC7763DFF7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3539C823-0795-4F50-8145-1EC7763DFF7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90B60D4D-FE8D-4328-B783-13EF4D852D28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90B60D4D-FE8D-4328-B783-13EF4D852D28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90B60D4D-FE8D-4328-B783-13EF4D852D28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90B60D4D-FE8D-4328-B783-13EF4D852D28}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{3539C823-0795-4F50-8145-1EC7763DFF7C} = {6087B072-D247-4CF9-9133-AF082ED7225C}
+		{90B60D4D-FE8D-4328-B783-13EF4D852D28} = {75B92DD1-00E3-4454-A2BD-C35472BA8F02}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5D45B47D-30F2-4FCF-82FE-B680E0E23DEF}
