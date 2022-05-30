@@ -7,7 +7,7 @@
         public int? Added { get; set; }
         public int? Metacritic { get; set; }
         public decimal? Rating { get; set; }
-        public DateTimeOffset? Released { get; set; }
+        public string Released { get; set; }
         public DateTimeOffset? Updated { get; set; }
 
         public Game(int id)

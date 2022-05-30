@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Net;
+using System.Text.Json;
 using Example.VideoGameTracker.Api.Models;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Caching.Distributed;
@@ -13,6 +14,11 @@ namespace Example.VideoGameTracker.Api.DataAccess
 {
     public class RawgVideoGameDatabase : IVideoGameDatabase
     {
+        private static readonly JsonSerializerOptions SERIALIZER_OPTIONS = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
         private readonly HttpClient _httpClient;
         private readonly RawgOptions _options;
         private readonly IDistributedCache _cache;
@@ -40,18 +46,20 @@ namespace Example.VideoGameTracker.Api.DataAccess
 
             var query = QueryHelpers.AddQueryString("games", queryParams);
 
-            var cachedResponse = await _cache.GetAsync(query, cancellationToken);
+            var cachedResponse = await _cache.GetStringAsync(query, cancellationToken);
 
             if (cachedResponse != null)
             {
-                var cachedGameData = JsonSerializer.Deserialize<GamesResponse>(cachedResponse);
+                var cachedGameData = JsonSerializer.Deserialize<GamesResponse>(
+                    cachedResponse,
+                     SERIALIZER_OPTIONS);
                 if (cachedGameData != null)
                 {
                     return cachedGameData.Results;
                 }
             }
 
-            using var request = new HttpRequestMessage(HttpMethod.Get, QueryHelpers.AddQueryString("games", queryParams))
+            using var request = new HttpRequestMessage(HttpMethod.Get, query)
                 .WithUserAgent();
 
             using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
@@ -64,22 +72,17 @@ namespace Example.VideoGameTracker.Api.DataAccess
 
             var gameData = JsonSerializer.Deserialize<GamesResponse>(
                 responseData,
-                new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
+                SERIALIZER_OPTIONS);
 
-            if (gameData != null)
+            if (gameData?.Results != null)
             {
                 await _cache.SetStringAsync(
                     query,
                     responseData,
                     new DistributedCacheEntryOptions
                     {
-                        // reduce load on Rawg slightly, could make this configurable
-                        // if this API were to be hosted on some managed gateway service
-                        // we could probably just utilize the built in caching there and remove this logic
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
+                        // reduce load on Rawg slightly
+                        AbsoluteExpirationRelativeToNow = _options.ApiResponeCacheDuration
                     },
                     cancellationToken);
 
@@ -96,27 +99,52 @@ namespace Example.VideoGameTracker.Api.DataAccess
                 {"key", _options.ApiKey },
                 {"lang", "en" }
             };
-            using var request = new HttpRequestMessage(HttpMethod.Get, QueryHelpers.AddQueryString($"games/{gameId}", queryParams))
+
+            var query = QueryHelpers.AddQueryString($"games/{gameId}", queryParams);
+
+            var cachedResponse = await _cache.GetStringAsync(query, cancellationToken);
+
+            if (cachedResponse != null)
+            {
+                var cachedGameData = JsonSerializer.Deserialize<Game>(
+                    cachedResponse,
+                     SERIALIZER_OPTIONS);
+                if (cachedGameData != null)
+                {
+                    return cachedGameData;
+                }
+            }
+
+            using var request = new HttpRequestMessage(HttpMethod.Get, query)
                 .WithUserAgent();
 
             using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
 
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return default;
+            }
+
             response.EnsureSuccessStatusCode();
 
-            //var rr = await response.Content.ReadAsStringAsync(cancellationToken);
+            var responseData = await response.Content.ReadAsStringAsync(cancellationToken);
 
-            using var responseData = await response.Content.ReadAsStreamAsync(cancellationToken);
-
-            var gameData = await JsonSerializer.DeserializeAsync<Game>(
+            var gameData = JsonSerializer.Deserialize<Game>(
                 responseData,
-                new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                },
-                cancellationToken);
+                SERIALIZER_OPTIONS);
 
             if (gameData != null)
             {
+                await _cache.SetStringAsync(
+                    query,
+                    responseData,
+                    new DistributedCacheEntryOptions
+                    {
+                        // reduce load on Rawg slightly
+                        AbsoluteExpirationRelativeToNow = _options.ApiResponeCacheDuration
+                    },
+                    cancellationToken);
+
                 return gameData;
             }
 

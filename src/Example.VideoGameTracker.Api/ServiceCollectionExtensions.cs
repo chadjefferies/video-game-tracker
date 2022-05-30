@@ -18,7 +18,7 @@ namespace Example.VideoGameTracker.Api
 
         public static IServiceCollection AddUserDatabase(this IServiceCollection services)
         {
-            services.AddSingleton<InMemoryUserDatabase>();
+            services.AddSingleton<IUserDatabase, InMemoryUserDatabase>();
             return services;
         }
     }

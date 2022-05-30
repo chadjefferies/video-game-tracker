@@ -9,10 +9,10 @@ namespace Example.VideoGameTracker.Api.Controllers
     public class UsersController : ControllerBase
     {
         private readonly ILogger<UsersController> _logger;
-        private readonly InMemoryUserDatabase _userDatabase;
+        private readonly IUserDatabase _userDatabase;
         private readonly IVideoGameDatabase _videoGameDatabase;
 
-        public UsersController(ILogger<UsersController> logger, InMemoryUserDatabase userDatabase, IVideoGameDatabase videoGameDatabase)
+        public UsersController(ILogger<UsersController> logger, IUserDatabase userDatabase, IVideoGameDatabase videoGameDatabase)
         {
             _logger = logger;
             _userDatabase = userDatabase;
@@ -27,9 +27,10 @@ namespace Example.VideoGameTracker.Api.Controllers
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> CreateNewUser(UserRequest user)
         {
-            if (await _userDatabase.AddNewUserAsync(new User(user)))
+            var newUser = new User(user);
+            if (await _userDatabase.AddNewAsync(newUser))
             {
-                return StatusCode(StatusCodes.Status201Created);
+                return Created(string.Empty, newUser);
             }
 
             return Conflict();
@@ -44,7 +45,7 @@ namespace Example.VideoGameTracker.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetUser(int userId)
         {
-            var user = await _userDatabase.GetUserAsync(userId);
+            var user = await _userDatabase.GetAsync(userId);
             if (user is null)
             {
                 return NotFound();
@@ -64,25 +65,27 @@ namespace Example.VideoGameTracker.Api.Controllers
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> AddFavoriteGame(int userId, [FromBody] AddFavoriteRequest request, CancellationToken cancellationToken)
         {
-            var user = await _userDatabase.GetUserAsync(userId);
-            if (user is null)
-            {
-                return NotFound();
-            }
-
             var game = await _videoGameDatabase.GetGameAsync(request.GameId, cancellationToken);
             if (game is null)
             {
-                return BadRequest();
+                return BadRequest($"Game {request.GameId} is not a valid game.");
             }
 
-            // TODO: thread safety
+            using var transaction = await _userDatabase.BeginTransactionAsync();
+            var user = await _userDatabase.GetAsync(userId);
+            if (user is null)
+            {
+                return NotFound($"User {userId} does not exist.");
+            }
+
             if (!user.Games.AddFavorite(game))
             {
-                return Conflict();
+                return Conflict($"Game {game.Id} is not part of this user's favorites.");
             }
 
-            // TODO: update database? can't depend on a local reference
+            await _userDatabase.UpdateAsync(user);
+
+            transaction.Commit();
 
             return NoContent();
         }
@@ -96,19 +99,21 @@ namespace Example.VideoGameTracker.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> RemoveFavoriteGame(int userId, int gameId)
         {
-            var user = await _userDatabase.GetUserAsync(userId);
+            using var transaction = await _userDatabase.BeginTransactionAsync();
+            var user = await _userDatabase.GetAsync(userId);
             if (user is null)
             {
-                return NotFound();
+                return NotFound($"User {userId} does not exist.");
             }
 
-            // TODO: thread safety
             if (!user.Games.RemoveFavorite(new Game(gameId)))
             {
-                return NotFound($"Game {gameId}");
+                return NotFound($"Game {gameId} is not in this user's list of favorites.");
             }
 
-            // TODO: update database? can't depend on a local reference
+            await _userDatabase.UpdateAsync(user);
+
+            transaction.Commit();
 
             return NoContent();
         }
@@ -120,25 +125,23 @@ namespace Example.VideoGameTracker.Api.Controllers
         [Route("{userId}/comparison")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CompareUserFavorites(
-            int userId,
-            [FromBody] ComparisonRequest comparisonRequest)
+        public async Task<IActionResult> CompareUserFavorites(int userId, [FromBody] ComparisonRequest comparisonRequest)
         {
-            var user = await _userDatabase.GetUserAsync(userId);
+            var user = await _userDatabase.GetAsync(userId);
             if (user is null)
             {
-                return NotFound();
+                return NotFound($"User {userId} does not exist.");
             }
 
-            var otherUser = await _userDatabase.GetUserAsync(comparisonRequest.OtherUserId);
+            var otherUser = await _userDatabase.GetAsync(comparisonRequest.OtherUserId);
             if (otherUser is null)
             {
-                return BadRequest();
+                return BadRequest($"User {comparisonRequest.OtherUserId} does not exist.");
             }
 
-            var gameComparison = user.Games.Compare(otherUser.Games, comparisonRequest.Comparison);
+            var gameComparison = user.Games.CompareFavorites(otherUser.Games, comparisonRequest.Comparison);
 
-            var response = new ComparisonResponse()
+            var response = new ComparisonResponse
             {
                 UserId = user.UserId,
                 OtherUserId = otherUser.UserId,
@@ -147,7 +150,6 @@ namespace Example.VideoGameTracker.Api.Controllers
             };
 
             return Ok(response);
-
         }
     }
 }

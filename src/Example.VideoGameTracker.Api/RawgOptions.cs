@@ -8,6 +8,8 @@ namespace Example.VideoGameTracker.Api
 
         public string ApiKey { get; set; }
 
+        public TimeSpan ApiResponeCacheDuration { get; set; }
+
         public RawgOptions Value => this;
     }
 }

@@ -23,7 +23,7 @@ namespace Example.VideoGameTracker.Api.Models
             return _games.Remove(game);
         }
 
-        public IEnumerable<Game> Compare(FavoriteGames other, FavoriteGameComparison mode)
+        public IEnumerable<Game> CompareFavorites(FavoriteGames other, FavoriteGameComparison mode)
         {
             return mode switch
             {
@@ -34,14 +34,8 @@ namespace Example.VideoGameTracker.Api.Models
             };
         }
 
-        public IEnumerator<Game> GetEnumerator()
-        {
-            return _games.GetEnumerator();
-        }
+        public IEnumerator<Game> GetEnumerator() => _games.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return _games.GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => _games.GetEnumerator();
     }
 }
