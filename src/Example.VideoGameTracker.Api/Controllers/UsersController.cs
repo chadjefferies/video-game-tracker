@@ -30,6 +30,7 @@ namespace Example.VideoGameTracker.Api.Controllers
             var newUser = new User(user);
             if (await _userDatabase.AddNewAsync(newUser))
             {
+                _logger.LogDebug("Created new user {userId}", newUser.UserId);
                 return Created(string.Empty, newUser);
             }
 
@@ -84,6 +85,8 @@ namespace Example.VideoGameTracker.Api.Controllers
 
             await _userDatabase.UpdateAsync(user);
 
+            _logger.LogDebug("Added game {gameId} user {userId} favorites", game.Id, userId);
+
             return NoContent();
         }
 
@@ -108,6 +111,8 @@ namespace Example.VideoGameTracker.Api.Controllers
             }
 
             await _userDatabase.UpdateAsync(user);
+
+            _logger.LogDebug("Removed game {gameId} user {userId} favorites", gameId, userId);
 
             return NoContent();
         }
