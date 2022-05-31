@@ -13,6 +13,10 @@ namespace Example.VideoGameTracker.Api.Models
             _games = new HashSet<Game>(games);
         }
 
+        public FavoriteGameCollection()
+            : this(Enumerable.Empty<Game>())
+        { }
+
         public bool AddFavorite(Game game) => _games.Add(game);
 
         public bool RemoveFavorite(Game game) => _games.Remove(game);

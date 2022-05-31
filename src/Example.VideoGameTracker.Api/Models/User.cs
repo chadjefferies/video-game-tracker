@@ -1,6 +1,6 @@
 ﻿namespace Example.VideoGameTracker.Api.Models
 {
-    public record User 
+    public record User
     {
         private static int _globalIdentityUserId = 0;
 
@@ -10,11 +10,15 @@
         public FavoriteGameCollection Games { get; }
 
         public User(UserRequest userRequest)
+            : this(userRequest.FirstName, userRequest.LastName)
+        { }
+
+        public User(string firstName, string lastName)
         {
             UserId = Interlocked.Increment(ref _globalIdentityUserId);
-            FirstName = userRequest.FirstName;
-            LastName = userRequest.LastName;
-            Games = new FavoriteGameCollection(Enumerable.Empty<Game>());
+            FirstName = firstName;
+            LastName = lastName;
+            Games = new FavoriteGameCollection();
         }
     }
 }
