@@ -34,9 +34,10 @@ namespace Example.VideoGameTracker.Api.DataAccess
         {
             var queryParams = new Dictionary<string, string?>(4)
             {
-                {"key", _options.ApiKey },
-                {"lang", "en" },
-                {"search", search }
+                { "key", _options.ApiKey },
+                { "lang", "en" },
+                { "page_size", "20"},
+                { "search", search }
             };
 
             if (!string.IsNullOrWhiteSpace(ordering))
@@ -96,8 +97,8 @@ namespace Example.VideoGameTracker.Api.DataAccess
         {
             var queryParams = new Dictionary<string, string?>(2)
             {
-                {"key", _options.ApiKey },
-                {"lang", "en" }
+                { "key", _options.ApiKey },
+                { "lang", "en" }
             };
 
             var query = QueryHelpers.AddQueryString($"games/{gameId}", queryParams);
