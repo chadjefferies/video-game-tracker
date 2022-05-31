@@ -85,7 +85,7 @@ namespace Example.VideoGameTracker.Api.Controllers
 
             await _userDatabase.UpdateAsync(user);
 
-            _logger.LogDebug("Added game {gameId} user {userId} favorites", game.Id, userId);
+            _logger.LogDebug("Added game {gameId} to user {userId} favorites", game.Id, userId);
 
             return NoContent();
         }
@@ -112,7 +112,7 @@ namespace Example.VideoGameTracker.Api.Controllers
 
             await _userDatabase.UpdateAsync(user);
 
-            _logger.LogDebug("Removed game {gameId} user {userId} favorites", gameId, userId);
+            _logger.LogDebug("Removed game {gameId} from user {userId} favorites", gameId, userId);
 
             return NoContent();
         }
