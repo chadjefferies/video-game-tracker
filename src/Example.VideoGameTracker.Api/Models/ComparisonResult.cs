@@ -1,6 +1,6 @@
 ﻿namespace Example.VideoGameTracker.Api.Models
 {
-    public class ComparisonResponse
+    public class ComparisonResult
     {
         public int UserId { get; set; }
         public int OtherUserId { get; set; }

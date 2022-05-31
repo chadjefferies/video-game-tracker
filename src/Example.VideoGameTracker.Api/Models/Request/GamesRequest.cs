@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Example.VideoGameTracker.Api.Validation;
 
-namespace Example.VideoGameTracker.Api.Models
+namespace Example.VideoGameTracker.Api.Models.Request
 {
-    public class GetGamesParameters
+    public class GamesRequest
     {
         [Required]
         public string? q { get; set; }

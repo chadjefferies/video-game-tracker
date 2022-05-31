@@ -1,4 +1,4 @@
-﻿namespace Example.VideoGameTracker.Api.Models
+﻿namespace Example.VideoGameTracker.Api.Models.Request
 {
     public class ComparisonRequest
     {

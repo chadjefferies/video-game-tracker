@@ -1,5 +1,5 @@
 using Example.VideoGameTracker.Api.DataAccess;
-using Example.VideoGameTracker.Api.Models;
+using Example.VideoGameTracker.Api.Models.Request;
 using static Example.VideoGameTracker.Api.Tests.GameHelpers;
 
 namespace Example.VideoGameTracker.Api.Tests
@@ -11,9 +11,9 @@ namespace Example.VideoGameTracker.Api.Tests
         {
             var db = new InMemoryUserDatabase();
             var addUser = new UserRequest("johnny", "gamer");
-            var result = await db.AddNewAsync(addUser);
+            var result = await db.AddNewAsync(addUser, CancellationToken.None);
             Assert.NotNull(result);
-            var getUser = await db.GetAsync(result.UserId);
+            var getUser = await db.GetAsync(result.UserId, CancellationToken.None);
             Assert.NotNull(getUser);
             Assert.Equal("johnny", getUser.FirstName);
             Assert.Equal("gamer", getUser.LastName);
@@ -25,9 +25,9 @@ namespace Example.VideoGameTracker.Api.Tests
         {
             var db = new InMemoryUserDatabase();
             var addUser = new UserRequest("jenny", "gamer");
-            var result = await db.AddNewAsync(addUser);
+            var result = await db.AddNewAsync(addUser, CancellationToken.None);
             Assert.NotNull(result);
-            var getUser = await db.GetAsync(result.UserId);
+            var getUser = await db.GetAsync(result.UserId, CancellationToken.None);
             Assert.NotNull(getUser);
             Assert.Equal("jenny", getUser.FirstName);
             Assert.Equal("gamer", getUser.LastName);
@@ -36,9 +36,9 @@ namespace Example.VideoGameTracker.Api.Tests
             // since the in-memory db is storing reference types
             // this update test isn't all that relevant.
             getUser.Games.AddFavorite(CreateGame(0));
-            var updateResult = await db.UpdateAsync(getUser);
+            var updateResult = await db.UpdateAsync(getUser, CancellationToken.None);
             Assert.True(updateResult);
-            var getUser2 = await db.GetAsync(getUser.UserId);
+            var getUser2 = await db.GetAsync(getUser.UserId, CancellationToken.None);
             Assert.NotNull(getUser2);
             Assert.Equal("jenny", getUser2.FirstName);
             Assert.Equal("gamer", getUser2.LastName);

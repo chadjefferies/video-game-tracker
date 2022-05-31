@@ -1,14 +1,15 @@
 ﻿using System.Data;
 using Example.VideoGameTracker.Api.Models;
+using Example.VideoGameTracker.Api.Models.Request;
 
 namespace Example.VideoGameTracker.Api.DataAccess
 {
     public interface IUserDatabase : IDisposable
     {
-        Task<User?> AddNewAsync(UserRequest user);
+        ValueTask<User?> AddNewAsync(UserRequest user, CancellationToken cancellationToken);
 
-        Task<User?> GetAsync(int userId);
+        ValueTask<User?> GetAsync(int userId, CancellationToken cancellationToken);
 
-        Task<bool> UpdateAsync(User user);
+        ValueTask<bool> UpdateAsync(User user, CancellationToken cancellationToken);
     }
 }

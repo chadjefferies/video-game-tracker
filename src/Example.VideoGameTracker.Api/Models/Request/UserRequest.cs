@@ -1,6 +1,6 @@
-﻿namespace Example.VideoGameTracker.Api.Models
+﻿namespace Example.VideoGameTracker.Api.Models.Request
 {
-    public record UserRequest
+    public class UserRequest
     {
         public string FirstName { get; }
         public string LastName { get; }

@@ -36,7 +36,7 @@ namespace Example.VideoGameTracker.Api.DataAccess
             {
                 { "key", _options.ApiKey },
                 { "lang", "en" },
-                { "page_size", "20"},
+                { "page_size", "20" }, // we are only returning the first page of 20 results.
                 { "search", search }
             };
 
@@ -67,7 +67,6 @@ namespace Example.VideoGameTracker.Api.DataAccess
 
             response.EnsureSuccessStatusCode();
 
-            // TODO: paging??
             // ReadAsStream would be more efficient here from an allocation standpoint, however we need the string to cache it anyways
             var responseData = await response.Content.ReadAsStringAsync(cancellationToken);
 

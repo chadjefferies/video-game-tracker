@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Example.VideoGameTracker.Api.Models;
+using Example.VideoGameTracker.Api.Models.Request;
 
 /********************************************************
  * Async in this class is overhead, but this is an implementation of IUserDatabase, 
@@ -20,30 +21,30 @@ namespace Example.VideoGameTracker.Api.DataAccess
             _users = new ConcurrentDictionary<int, User>();
         }
 
-        public Task<User?> AddNewAsync(UserRequest user)
+        public ValueTask<User?> AddNewAsync(UserRequest user, CancellationToken cancellationToken)
         {
             int userId = Interlocked.Increment(ref _globalIdentityUserId);
             var newUser = new User(userId, user.FirstName, user.LastName);
             if (_users.TryAdd(newUser.UserId, newUser))
             {
-                return Task.FromResult<User?>(newUser);
+                return ValueTask.FromResult<User?>(newUser);
             }
 
-            return Task.FromResult<User?>(default);
+            return ValueTask.FromResult<User?>(default);
         }
 
-        public Task<User?> GetAsync(int userId)
+        public ValueTask<User?> GetAsync(int userId, CancellationToken cancellationToken)
         {
             if (_users.TryGetValue(userId, out var user))
             {
 
-                return Task.FromResult<User?>(user);
+                return ValueTask.FromResult<User?>(user);
             }
 
-            return Task.FromResult<User?>(default);
+            return ValueTask.FromResult<User?>(default);
         }
 
-        public Task<bool> UpdateAsync(User user)
+        public ValueTask<bool> UpdateAsync(User user, CancellationToken cancellationToken)
         {
             // since we are doing a blind update here
             // it is possible we overwrite another thread's work here inadvertently.
@@ -52,7 +53,7 @@ namespace Example.VideoGameTracker.Api.DataAccess
             // then commit/unlock after the update. Or deep copy the user on retrieval and 
             // use TryUpdate to compare before updating.
             _users[user.UserId] = user;
-            return Task.FromResult(true);
+            return ValueTask.FromResult(true);
         }
 
         public void Dispose() { }

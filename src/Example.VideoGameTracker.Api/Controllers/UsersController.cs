@@ -1,5 +1,6 @@
 using Example.VideoGameTracker.Api.DataAccess;
 using Example.VideoGameTracker.Api.Models;
+using Example.VideoGameTracker.Api.Models.Request;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Example.VideoGameTracker.Api.Controllers
@@ -25,9 +26,9 @@ namespace Example.VideoGameTracker.Api.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> CreateNewUser(UserRequest user)
+        public async Task<IActionResult> CreateNewUser(UserRequest user, CancellationToken cancellationToken)
         {
-            var newUser = await _userDatabase.AddNewAsync(user);
+            var newUser = await _userDatabase.AddNewAsync(user, cancellationToken);
             if (newUser is null)
             {
                 return Conflict();
@@ -44,9 +45,9 @@ namespace Example.VideoGameTracker.Api.Controllers
         [Route("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetUser(int userId)
+        public async Task<IActionResult> GetUser(int userId, CancellationToken cancellationToken)
         {
-            var user = await _userDatabase.GetAsync(userId);
+            var user = await _userDatabase.GetAsync(userId, cancellationToken);
             if (user is null)
             {
                 return NotFound();
@@ -72,7 +73,7 @@ namespace Example.VideoGameTracker.Api.Controllers
                 return BadRequest($"Game {request.GameId} is not a valid game.");
             }
 
-            var user = await _userDatabase.GetAsync(userId);
+            var user = await _userDatabase.GetAsync(userId, cancellationToken);
             if (user is null)
             {
                 return NotFound($"User {userId} does not exist.");
@@ -83,7 +84,7 @@ namespace Example.VideoGameTracker.Api.Controllers
                 return Conflict($"Game {game.Id} is already a part of this user's favorites.");
             }
 
-            await _userDatabase.UpdateAsync(user);
+            await _userDatabase.UpdateAsync(user, cancellationToken);
 
             _logger.LogDebug("Added game {gameId} to user {userId} favorites", game.Id, userId);
 
@@ -97,9 +98,9 @@ namespace Example.VideoGameTracker.Api.Controllers
         [Route("{userId}/games/{gameId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> RemoveFavoriteGame(int userId, int gameId)
+        public async Task<IActionResult> RemoveFavoriteGame(int userId, int gameId, CancellationToken cancellationToken)
         {
-            var user = await _userDatabase.GetAsync(userId);
+            var user = await _userDatabase.GetAsync(userId, cancellationToken);
             if (user is null)
             {
                 return NotFound($"User {userId} does not exist.");
@@ -110,7 +111,7 @@ namespace Example.VideoGameTracker.Api.Controllers
                 return NotFound($"Game {gameId} is not in this user's list of favorites.");
             }
 
-            await _userDatabase.UpdateAsync(user);
+            await _userDatabase.UpdateAsync(user, cancellationToken);
 
             _logger.LogDebug("Removed game {gameId} from user {userId} favorites", gameId, userId);
 
@@ -124,15 +125,15 @@ namespace Example.VideoGameTracker.Api.Controllers
         [Route("{userId}/comparison")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CompareUserFavorites(int userId, [FromBody] ComparisonRequest comparisonRequest)
+        public async Task<IActionResult> CompareUserFavorites(int userId, [FromBody] ComparisonRequest comparisonRequest, CancellationToken cancellationToken)
         {
-            var user = await _userDatabase.GetAsync(userId);
+            var user = await _userDatabase.GetAsync(userId, cancellationToken);
             if (user is null)
             {
                 return NotFound($"User {userId} does not exist.");
             }
 
-            var otherUser = await _userDatabase.GetAsync(comparisonRequest.OtherUserId);
+            var otherUser = await _userDatabase.GetAsync(comparisonRequest.OtherUserId, cancellationToken);
             if (otherUser is null)
             {
                 return BadRequest($"User {comparisonRequest.OtherUserId} does not exist.");
@@ -140,7 +141,7 @@ namespace Example.VideoGameTracker.Api.Controllers
 
             var gameComparison = user.Games.CompareFavorites(otherUser.Games, comparisonRequest.Comparison);
 
-            var response = new ComparisonResponse
+            var result = new ComparisonResult
             {
                 UserId = user.UserId,
                 OtherUserId = otherUser.UserId,
@@ -148,7 +149,7 @@ namespace Example.VideoGameTracker.Api.Controllers
                 Games = gameComparison
             };
 
-            return Ok(response);
+            return Ok(result);
         }
     }
 }

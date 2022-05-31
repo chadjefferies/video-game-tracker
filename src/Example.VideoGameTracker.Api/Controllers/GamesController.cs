@@ -1,5 +1,5 @@
 using Example.VideoGameTracker.Api.DataAccess;
-using Example.VideoGameTracker.Api.Models;
+using Example.VideoGameTracker.Api.Models.Request;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Example.VideoGameTracker.Api.Controllers
@@ -8,12 +8,10 @@ namespace Example.VideoGameTracker.Api.Controllers
     [Route("games")]
     public class GamesController : ControllerBase
     {
-        private readonly ILogger<GamesController> _logger;
         private readonly IVideoGameDatabase _videoGameDatabase;
 
-        public GamesController(ILogger<GamesController> logger, IVideoGameDatabase videoGameDatabase)
+        public GamesController(IVideoGameDatabase videoGameDatabase)
         {
-            _logger = logger;
             _videoGameDatabase = videoGameDatabase;
         }
 
@@ -24,9 +22,9 @@ namespace Example.VideoGameTracker.Api.Controllers
         [HttpGet()]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetGamesAsync([FromQuery] GetGamesParameters parameters, CancellationToken cancellation)
+        public async Task<IActionResult> GetGamesAsync([FromQuery] GamesRequest parameters, CancellationToken cancellationToken)
         {
-            var gameData = await _videoGameDatabase.GetGamesAsync(parameters.q, parameters.sort, cancellation);
+            var gameData = await _videoGameDatabase.GetGamesAsync(parameters.q, parameters.sort, cancellationToken);
             return Ok(gameData);
         }
     }
