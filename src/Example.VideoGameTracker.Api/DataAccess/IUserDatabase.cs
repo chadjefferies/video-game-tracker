@@ -5,7 +5,7 @@ namespace Example.VideoGameTracker.Api.DataAccess
 {
     public interface IUserDatabase : IDisposable
     {
-        Task<bool> AddNewAsync(User user);
+        Task<User?> AddNewAsync(UserRequest user);
 
         Task<User?> GetAsync(int userId);
 

@@ -27,14 +27,14 @@ namespace Example.VideoGameTracker.Api.Controllers
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> CreateNewUser(UserRequest user)
         {
-            var newUser = new User(user);
-            if (await _userDatabase.AddNewAsync(newUser))
+            var newUser = await _userDatabase.AddNewAsync(user);
+            if (newUser is null)
             {
-                _logger.LogDebug("Created new user {userId}", newUser.UserId);
-                return Created(string.Empty, newUser);
+                return Conflict();
             }
 
-            return Conflict();
+            _logger.LogDebug("Created new user {userId}", newUser.UserId);
+            return Created(string.Empty, newUser);
         }
 
         /// <summary>

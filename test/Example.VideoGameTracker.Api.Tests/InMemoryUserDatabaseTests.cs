@@ -10,10 +10,10 @@ namespace Example.VideoGameTracker.Api.Tests
         public async Task AddAndGet()
         {
             var db = new InMemoryUserDatabase();
-            var addUser = new User("johnny", "gamer");
+            var addUser = new UserRequest("johnny", "gamer");
             var result = await db.AddNewAsync(addUser);
-            Assert.True(result);
-            var getUser = await db.GetAsync(addUser.UserId);
+            Assert.NotNull(result);
+            var getUser = await db.GetAsync(result.UserId);
             Assert.NotNull(getUser);
             Assert.Equal("johnny", getUser.FirstName);
             Assert.Equal("gamer", getUser.LastName);
@@ -24,10 +24,10 @@ namespace Example.VideoGameTracker.Api.Tests
         public async Task AddUpdateAndGet()
         {
             var db = new InMemoryUserDatabase();
-            var addUser = new User("jenny", "gamer");
+            var addUser = new UserRequest("jenny", "gamer");
             var result = await db.AddNewAsync(addUser);
-            Assert.True(result);
-            var getUser = await db.GetAsync(addUser.UserId);
+            Assert.NotNull(result);
+            var getUser = await db.GetAsync(result.UserId);
             Assert.NotNull(getUser);
             Assert.Equal("jenny", getUser.FirstName);
             Assert.Equal("gamer", getUser.LastName);

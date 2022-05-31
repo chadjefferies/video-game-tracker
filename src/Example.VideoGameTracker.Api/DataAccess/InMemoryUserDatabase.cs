@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Data;
 using Example.VideoGameTracker.Api.Models;
 
 /********************************************************
@@ -12,6 +11,8 @@ namespace Example.VideoGameTracker.Api.DataAccess
 {
     public class InMemoryUserDatabase : IUserDatabase
     {
+        private static int _globalIdentityUserId = 0;
+
         private readonly ConcurrentDictionary<int, User> _users;
 
         public InMemoryUserDatabase()
@@ -19,9 +20,16 @@ namespace Example.VideoGameTracker.Api.DataAccess
             _users = new ConcurrentDictionary<int, User>();
         }
 
-        public Task<bool> AddNewAsync(User user)
+        public Task<User?> AddNewAsync(UserRequest user)
         {
-            return Task.FromResult(_users.TryAdd(user.UserId, user));
+            int userId = Interlocked.Increment(ref _globalIdentityUserId);
+            var newUser = new User(userId, user.FirstName, user.LastName);
+            if (_users.TryAdd(newUser.UserId, newUser))
+            {
+                return Task.FromResult<User?>(newUser);
+            }
+
+            return Task.FromResult<User?>(default);
         }
 
         public Task<User?> GetAsync(int userId)
