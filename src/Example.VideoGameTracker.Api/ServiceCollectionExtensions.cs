@@ -10,7 +10,7 @@ namespace Example.VideoGameTracker.Api
             services.AddHttpClient<IVideoGameDatabase, RawgVideoGameDatabase>((sp, client) =>
             {
                 var opt = sp.GetRequiredService<IOptions<RawgOptions>>();
-                client.BaseAddress = new Uri(opt.Value.ApiUrl);
+                client.BaseAddress = new Uri(opt.Value.ApiUrl ?? string.Empty);
             })
             .SetHandlerLifetime(Timeout.InfiniteTimeSpan);
             return services;

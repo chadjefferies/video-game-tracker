@@ -22,7 +22,7 @@ namespace Example.VideoGameTracker.Api.Controllers
         /// <summary>
         /// Create a new user.
         /// </summary>
-        [HttpPut]
+        [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> CreateNewUser(UserRequest user)
@@ -71,7 +71,6 @@ namespace Example.VideoGameTracker.Api.Controllers
                 return BadRequest($"Game {request.GameId} is not a valid game.");
             }
 
-            using var transaction = await _userDatabase.BeginTransactionAsync();
             var user = await _userDatabase.GetAsync(userId);
             if (user is null)
             {
@@ -80,12 +79,10 @@ namespace Example.VideoGameTracker.Api.Controllers
 
             if (!user.Games.AddFavorite(game))
             {
-                return Conflict($"Game {game.Id} is not part of this user's favorites.");
+                return Conflict($"Game {game.Id} is already a part of this user's favorites.");
             }
 
             await _userDatabase.UpdateAsync(user);
-
-            transaction.Commit();
 
             return NoContent();
         }
@@ -99,21 +96,18 @@ namespace Example.VideoGameTracker.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> RemoveFavoriteGame(int userId, int gameId)
         {
-            using var transaction = await _userDatabase.BeginTransactionAsync();
             var user = await _userDatabase.GetAsync(userId);
             if (user is null)
             {
                 return NotFound($"User {userId} does not exist.");
             }
 
-            if (!user.Games.RemoveFavorite(new Game(gameId)))
+            if (!user.Games.RemoveFavorite(new Game { Id = gameId }))
             {
                 return NotFound($"Game {gameId} is not in this user's list of favorites.");
             }
 
             await _userDatabase.UpdateAsync(user);
-
-            transaction.Commit();
 
             return NoContent();
         }
@@ -146,7 +140,7 @@ namespace Example.VideoGameTracker.Api.Controllers
                 UserId = user.UserId,
                 OtherUserId = otherUser.UserId,
                 Comparison = comparisonRequest.Comparison,
-                Games = gameComparison.ToList()
+                Games = gameComparison
             };
 
             return Ok(response);

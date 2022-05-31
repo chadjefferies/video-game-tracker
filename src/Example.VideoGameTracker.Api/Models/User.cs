@@ -7,14 +7,14 @@
         public int UserId { get; }
         public string FirstName { get; }
         public string LastName { get; }
-        public FavoriteGames Games { get; }
+        public FavoriteGameCollection Games { get; }
 
         public User(UserRequest userRequest)
         {
             UserId = Interlocked.Increment(ref _globalIdentityUserId);
             FirstName = userRequest.FirstName;
             LastName = userRequest.LastName;
-            Games = new FavoriteGames(Enumerable.Empty<Game>());
+            Games = new FavoriteGameCollection(Enumerable.Empty<Game>());
         }
     }
 }

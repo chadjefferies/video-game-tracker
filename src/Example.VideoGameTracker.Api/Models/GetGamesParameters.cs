@@ -1,18 +1,13 @@
-﻿using Example.VideoGameTracker.Api.Validation;
+﻿using System.ComponentModel.DataAnnotations;
+using Example.VideoGameTracker.Api.Validation;
 
 namespace Example.VideoGameTracker.Api.Models
 {
     public class GetGamesParameters
     {
-        public string q { get; set; }
-        [ValidValues(null,
-            "name", "-name",
-            "released", "-released",
-            "added", "-added",
-            "created", "-created",
-            "updated", "-updated",
-            "rating", "-rating",
-            "metacritic", "-metacritic")]
+        [Required]
+        public string? q { get; set; }
+        [ValidSortOptions]
         public string? sort { get; set; }
     }
 }

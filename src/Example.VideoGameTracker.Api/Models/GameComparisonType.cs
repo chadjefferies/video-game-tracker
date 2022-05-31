@@ -1,17 +1,17 @@
 ﻿namespace Example.VideoGameTracker.Api.Models
 {
-    public enum FavoriteGameComparison
+    public enum GameComparisonType
     {
         /// <summary>
-        /// list the favorite games of both users.
+        /// List the favorite games of both users.
         /// </summary>
         Union,
         /// <summary>
-        /// list the favorite games that both users have in common.
+        /// List the favorite games that both users have in common.
         /// </summary>
         Intersection,
         /// <summary>
-        /// list the favorite games added by the other user but not by the current user.
+        /// List the favorite games added by the other user but not by the current user.
         /// </summary>
         Difference
     }

@@ -30,9 +30,9 @@ namespace Example.VideoGameTracker.Api.DataAccess
             _cache = cache;
         }
 
-        public async Task<IEnumerable<Game>> GetGamesAsync(string search, string ordering, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Game>?> GetGamesAsync(string? search, string? ordering, CancellationToken cancellationToken)
         {
-            var queryParams = new Dictionary<string, string>(4)
+            var queryParams = new Dictionary<string, string?>(4)
             {
                 {"key", _options.ApiKey },
                 {"lang", "en" },
@@ -92,9 +92,9 @@ namespace Example.VideoGameTracker.Api.DataAccess
             return Enumerable.Empty<Game>();
         }
 
-        public async Task<Game> GetGameAsync(int gameId, CancellationToken cancellationToken)
+        public async Task<Game?> GetGameAsync(int gameId, CancellationToken cancellationToken)
         {
-            var queryParams = new Dictionary<string, string>(2)
+            var queryParams = new Dictionary<string, string?>(2)
             {
                 {"key", _options.ApiKey },
                 {"lang", "en" }

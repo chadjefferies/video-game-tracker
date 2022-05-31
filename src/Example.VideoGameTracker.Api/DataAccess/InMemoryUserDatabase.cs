@@ -19,31 +19,28 @@ namespace Example.VideoGameTracker.Api.DataAccess
             _users = new ConcurrentDictionary<int, User>();
         }
 
-        public Task<IDbTransaction> BeginTransactionAsync()
-        {
-            return Task.FromResult<IDbTransaction>(new InMemoryTransaction());
-        }
-
         public Task<bool> AddNewAsync(User user)
         {
             return Task.FromResult(_users.TryAdd(user.UserId, user));
         }
 
-        public Task<User> GetAsync(int userId)
+        public Task<User?> GetAsync(int userId)
         {
             if (_users.TryGetValue(userId, out var user))
             {
-                return Task.FromResult(user);
+
+                return Task.FromResult<User?>(user);
             }
 
-            return Task.FromResult<User>(default);
+            return Task.FromResult<User?>(default);
         }
 
         public Task<bool> UpdateAsync(User user)
         {
             // since we are doing a blind update here
-            // it is possible we overwrite another thread's work here inadvertently
-            // ideally the caller would start a transaction before retrieving the data
+            // it is possible we overwrite another thread's work here inadvertently.
+            // pretty unlikely since this is scoped at the user level, but possible.
+            // ideally the controller would start a transaction before retrieving the data
             // then commit after the update. Or deep copy the user on retrieval and 
             // use TryUpdate to compare before updating.
             _users[user.UserId] = user;

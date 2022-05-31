@@ -3,6 +3,6 @@
     public class ComparisonRequest
     {
         public int OtherUserId { get; set; }
-        public FavoriteGameComparison Comparison { get; set; }
+        public GameComparisonType Comparison { get; set; }
     }
 }
