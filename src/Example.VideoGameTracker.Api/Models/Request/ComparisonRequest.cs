@@ -2,7 +2,13 @@
 {
     public class ComparisonRequest
     {
-        public int OtherUserId { get; set; }
-        public GameComparisonType Comparison { get; set; }
+        public int OtherUserId { get; }
+        public GameComparisonType Comparison { get; }
+
+        public ComparisonRequest(int otherUserId, GameComparisonType comparison)
+        {
+            OtherUserId = otherUserId;
+            Comparison = comparison;
+        }
     }
 }

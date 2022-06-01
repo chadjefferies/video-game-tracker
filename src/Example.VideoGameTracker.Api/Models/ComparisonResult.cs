@@ -2,9 +2,17 @@
 {
     public class ComparisonResult
     {
-        public int UserId { get; set; }
-        public int OtherUserId { get; set; }
-        public GameComparisonType Comparison { get; set; }
-        public IEnumerable<Game>? Games { get; set; }
+        public int UserId { get; }
+        public int OtherUserId { get; }
+        public GameComparisonType Comparison { get; }
+        public IEnumerable<Game>? Games { get; }
+
+        public ComparisonResult(int userId, int otherUserId, GameComparisonType comparison, IEnumerable<Game>? games)
+        {
+            UserId = userId;
+            OtherUserId = otherUserId;
+            Comparison = comparison;
+            Games = games;
+        }
     }
 }

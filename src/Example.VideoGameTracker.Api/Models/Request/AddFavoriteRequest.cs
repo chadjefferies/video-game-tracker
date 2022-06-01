@@ -2,6 +2,10 @@
 {
     public class AddFavoriteRequest
     {
-        public int GameId { get; set; }
+        public int GameId { get; }
+        public AddFavoriteRequest(int gameId)        {
+            GameId = gameId;
+        }
+
     }
 }

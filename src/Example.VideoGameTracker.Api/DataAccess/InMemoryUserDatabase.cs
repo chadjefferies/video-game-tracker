@@ -37,7 +37,6 @@ namespace Example.VideoGameTracker.Api.DataAccess
         {
             if (_users.TryGetValue(userId, out var user))
             {
-
                 return ValueTask.FromResult<User?>(user);
             }
 

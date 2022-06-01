@@ -15,14 +15,7 @@ namespace Example.VideoGameTracker.Api.Tests
 
         public static Game CreateGame(int i)
         {
-            return new Game
-            {
-                Id = i,
-                Name = $"game{i}",
-                Added = i,
-                Metacritic = i,
-                Rating = i
-            };
+            return new Game(i, $"game{i}", i, i, i, null, null);
         }
     }
 }

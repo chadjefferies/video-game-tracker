@@ -50,7 +50,7 @@ namespace Example.VideoGameTracker.Api.Controllers
             var user = await _userDatabase.GetAsync(userId, cancellationToken);
             if (user is null)
             {
-                return NotFound();
+                return NotFound($"User {userId} does not exist.");
             }
 
             return Ok(user);
@@ -106,7 +106,7 @@ namespace Example.VideoGameTracker.Api.Controllers
                 return NotFound($"User {userId} does not exist.");
             }
 
-            if (!user.Games.RemoveFavorite(new Game { Id = gameId }))
+            if (!user.Games.RemoveFavorite(new Game(gameId)))
             {
                 return NotFound($"Game {gameId} is not in this user's list of favorites.");
             }
@@ -141,13 +141,11 @@ namespace Example.VideoGameTracker.Api.Controllers
 
             var gameComparison = user.Games.CompareFavorites(otherUser.Games, comparisonRequest.Comparison);
 
-            var result = new ComparisonResult
-            {
-                UserId = user.UserId,
-                OtherUserId = otherUser.UserId,
-                Comparison = comparisonRequest.Comparison,
-                Games = gameComparison
-            };
+            var result = new ComparisonResult(
+                user.UserId, 
+                otherUser.UserId, 
+                comparisonRequest.Comparison, 
+                gameComparison);
 
             return Ok(result);
         }

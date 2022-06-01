@@ -1,14 +1,33 @@
-﻿namespace Example.VideoGameTracker.Api.Models
+﻿using System.Text.Json.Serialization;
+
+namespace Example.VideoGameTracker.Api.Models
 {
     public class Game : IEquatable<Game>
     {
-        public int Id { get; set; }
-        public string? Name { get; set; }
-        public int? Added { get; set; }
-        public int? Metacritic { get; set; }
-        public decimal? Rating { get; set; }
-        public string? Released { get; set; }
-        public DateTimeOffset? Updated { get; set; }
+        public int Id { get; }
+        public string? Name { get; }
+        public int? Added { get; }
+        public int? Metacritic { get; }
+        public decimal? Rating { get; }
+        public string? Released { get; }
+        public DateTimeOffset? Updated { get; }
+
+        public Game(int id)
+        {
+            Id = id;
+        }
+
+        [JsonConstructor]
+        public Game(int id, string? name, int? added, int? metacritic, decimal? rating, string? released, DateTimeOffset? updated)
+        {
+            Id = id;
+            Name = name;
+            Added = added;
+            Metacritic = metacritic;
+            Rating = rating;
+            Released = released;
+            Updated = updated;
+        }
 
         public override int GetHashCode() => Id.GetHashCode();
 
