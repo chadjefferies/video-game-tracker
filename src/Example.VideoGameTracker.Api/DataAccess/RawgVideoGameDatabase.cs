@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text.Json;
+using Example.VideoGameTracker.Api.Extensions;
 using Example.VideoGameTracker.Api.Models;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Caching.Distributed;

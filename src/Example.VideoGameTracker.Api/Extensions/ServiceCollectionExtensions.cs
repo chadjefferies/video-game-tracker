@@ -1,7 +1,7 @@
 ﻿using Example.VideoGameTracker.Api.DataAccess;
 using Microsoft.Extensions.Options;
 
-namespace Example.VideoGameTracker.Api
+namespace Example.VideoGameTracker.Api.Extensions
 {
     public static class ServiceCollectionExtensions
     {

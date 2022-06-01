@@ -1,6 +1,6 @@
 ﻿using System.Net.Http.Headers;
 
-namespace Example.VideoGameTracker.Api
+namespace Example.VideoGameTracker.Api.Extensions
 {
     public static class HttpRequestMessageExtensions
     {

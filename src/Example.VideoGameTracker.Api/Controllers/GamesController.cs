@@ -19,7 +19,7 @@ namespace Example.VideoGameTracker.Api.Controllers
         /// Retrieve a list of video games matching the specified filter parameters.
         /// </summary>
         /// <returns>A filtered list of video games.</returns>
-        [HttpGet()]
+        [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetGamesAsync([FromQuery] GamesRequest parameters, CancellationToken cancellationToken)
