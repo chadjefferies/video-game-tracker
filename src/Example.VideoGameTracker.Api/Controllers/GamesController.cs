@@ -21,7 +21,7 @@ namespace Example.VideoGameTracker.Api.Controllers
         /// <returns>A filtered list of video games.</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetGamesAsync([FromQuery] GamesRequest parameters, CancellationToken cancellationToken)
         {
             var gameData = await _videoGameDatabase.GetGamesAsync(parameters.q, parameters.sort, cancellationToken);

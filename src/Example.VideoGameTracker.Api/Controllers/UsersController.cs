@@ -25,16 +25,11 @@ namespace Example.VideoGameTracker.Api.Controllers
         /// </summary>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> CreateNewUser(UserRequest user, CancellationToken cancellationToken)
         {
             var newUser = await _userDatabase.AddNewAsync(user, cancellationToken);
-            if (newUser is null)
-            {
-                return Conflict();
-            }
 
-            _logger.LogDebug("Created new user {userId}", newUser.UserId);
+            _logger.LogDebug("Created new user {userId}", newUser?.UserId);
             return Created(string.Empty, newUser);
         }
 
@@ -124,7 +119,8 @@ namespace Example.VideoGameTracker.Api.Controllers
         [HttpPost]
         [Route("{userId}/comparison")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CompareUserFavorites(int userId, [FromBody] ComparisonRequest comparisonRequest, CancellationToken cancellationToken)
         {
             var user = await _userDatabase.GetAsync(userId, cancellationToken);
