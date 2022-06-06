@@ -14,7 +14,7 @@ Store your API key in the local [Secrets Manager](https://docs.microsoft.com/en-
 }
 ```
 
-Once your api key is in place, start up the *Example.VideoGameTracker.Api* project and navigate to the `/swagger` page. _You can save this in your launchSettings.json to save time_.
+Once your api key is in place, start up the *Example.VideoGameTracker.Api* project and navigate to the `/swagger` page. 
 
 Your first step will be to add users to the service by calling `POST /users`. Make note of the userId returned and add at least two users for the comparison feature later discussed. Please note the users you add are ephemeral and only live for the life of the API. (_Feel free to submit a PR integrating this awesome service with an actual database_) :smile:
 

@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "Example.VideoGameTracker.Api": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:63831;http://localhost:63832"
+    }
+  }
+}
