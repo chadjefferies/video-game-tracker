@@ -101,7 +101,7 @@ namespace Example.VideoGameTracker.Api.Controllers
                 return NotFound($"User {userId} does not exist.");
             }
 
-            if (!user.Games.RemoveFavorite(new Game(gameId)))
+            if (!user.Games.RemoveFavorite(gameId))
             {
                 return NotFound($"Game {gameId} is not in this user's list of favorites.");
             }

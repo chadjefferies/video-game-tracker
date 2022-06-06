@@ -19,7 +19,7 @@ namespace Example.VideoGameTracker.Api.Models
 
         public bool AddFavorite(Game game) => _games.Add(game);
 
-        public bool RemoveFavorite(Game game) => _games.Remove(game);
+        public bool RemoveFavorite(int gameId) => _games.Remove(new Game(gameId));
 
         public IEnumerable<Game> CompareFavorites(FavoriteGameCollection other, GameComparisonType mode)
         {
