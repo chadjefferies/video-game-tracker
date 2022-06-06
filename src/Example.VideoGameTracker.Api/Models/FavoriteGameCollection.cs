@@ -27,7 +27,7 @@ namespace Example.VideoGameTracker.Api.Models
             {
                 GameComparisonType.Union => _games.Union(other.Games),
                 GameComparisonType.Intersection => _games.Intersect(other.Games),
-                GameComparisonType.Difference => other._games.Except(Games),
+                GameComparisonType.Difference => other.Games.Except(_games),
                 _ => throw new NotImplementedException(),
             };
         }
