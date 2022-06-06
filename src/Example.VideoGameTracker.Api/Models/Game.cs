@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Example.VideoGameTracker.Api.Models
+﻿namespace Example.VideoGameTracker.Api.Models
 {
     public class Game : IEquatable<Game>
     {
@@ -12,13 +10,7 @@ namespace Example.VideoGameTracker.Api.Models
         public string? Released { get; }
         public DateTimeOffset? Updated { get; }
 
-        public Game(int id)
-        {
-            Id = id;
-        }
-
-        [JsonConstructor]
-        public Game(int id, string? name, int? added, int? metacritic, decimal? rating, string? released, DateTimeOffset? updated)
+        public Game(int id, string? name = null, int? added = null, int? metacritic = null, decimal? rating = null, string? released = null, DateTimeOffset? updated = null)
         {
             Id = id;
             Name = name;
